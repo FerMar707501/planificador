@@ -1,0 +1,9 @@
+{
+  "name": "planificador-backend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "pg": "^8.23.0",
+    "sequelize": "^6.37.8"
+  }
+}
