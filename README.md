@@ -74,11 +74,13 @@ Todas las rutas están bajo el prefijo `/api`.
 | PUT | `/users/me` | JWT | Editar `correo`, `nombreCompleto`, `telefono` |
 | GET | `/admin/logs` | JWT + rol admin | Listar eventos de `logs_sistema` |
 | GET | `/admin/users` | JWT + rol admin | Listar usuarios (sin `contrasenaHash`) |
+| POST | `/sync/backup` | JWT | **Stub** — responde `501`, sin lógica real todavía |
+| GET | `/sync/backups` | JWT | **Stub** — responde `501`, sin lógica real todavía |
 
-Los endpoints de sincronización/respaldo cifrado (`/sync/backup`,
-`/sync/backups`) están documentados en la especificación como **stub
-pendiente**: el modelo `RespaldoSincronizacion` ya existe, pero el
-controlador y las rutas todavía no se implementan.
+Los endpoints de sincronización/respaldo cifrado ya están montados y
+protegidos con JWT, pero siguen como **stub** (responden `501`) hasta que
+se defina el flujo de cifrado del lado del cliente. El modelo
+`RespaldoSincronizacion` ya existe en la base de datos.
 
 ## Colección Postman
 

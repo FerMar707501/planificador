@@ -1,15 +1,5 @@
 const { Usuario } = require('../models');
-
-function usuarioPerfil(usuario) {
-  return {
-    idUsuario: usuario.idUsuario,
-    nombreUsuario: usuario.nombreUsuario,
-    correo: usuario.correo,
-    nombreCompleto: usuario.nombreCompleto,
-    telefono: usuario.telefono,
-    rol: usuario.rol,
-  };
-}
+const usuarioPublico = require('../utils/usuarioPublico');
 
 async function obtenerPerfil(req, res, next) {
   try {
@@ -19,7 +9,7 @@ async function obtenerPerfil(req, res, next) {
       return res.status(401).json({ error: 'Usuario no autorizado' });
     }
 
-    return res.status(200).json({ usuario: usuarioPerfil(usuario) });
+    return res.status(200).json({ usuario: usuarioPublico(usuario) });
   } catch (error) {
     return next(error);
   }
@@ -34,7 +24,7 @@ async function actualizarPerfil(req, res, next) {
     }
 
     await usuario.update(req.body);
-    return res.status(200).json({ usuario: usuarioPerfil(usuario) });
+    return res.status(200).json({ usuario: usuarioPublico(usuario) });
   } catch (error) {
     if (error.name === 'SequelizeUniqueConstraintError') {
       return res.status(409).json({ error: 'El correo ya está registrado' });

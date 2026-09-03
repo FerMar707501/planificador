@@ -5,18 +5,9 @@ const { Usuario } = require('../models');
 const { enviarContrasenaTemporal, crearTransportador } = require('./email.service');
 const { registrarLog } = require('./logs.service');
 const generarContrasenaTemporal = require('../utils/generarContrasenaTemporal');
+const usuarioPublico = require('../utils/usuarioPublico');
 
 const rondasBcrypt = 12;
-
-function usuarioPublico(usuario) {
-  return {
-    idUsuario: usuario.idUsuario,
-    nombreUsuario: usuario.nombreUsuario,
-    nombreCompleto: usuario.nombreCompleto,
-    correo: usuario.correo,
-    rol: usuario.rol,
-  };
-}
 
 async function registrarUsuario(datos) {
   const contrasenaHash = await bcrypt.hash(datos.contrasena, rondasBcrypt);
@@ -42,8 +33,9 @@ async function buscarUsuarioPorIdentificador(identificador) {
 }
 
 async function recuperarContrasena(correo) {
-  crearTransportador();
-
+  // La existencia del correo nunca debe filtrarse al cliente: si no hay
+  // usuario, simplemente no se hace nada y el controlador responde 200
+  // genérico igualmente.
   const usuario = await Usuario.findOne({
     where: { correo: correo.toLowerCase() },
   });
@@ -57,6 +49,11 @@ async function recuperarContrasena(correo) {
   const transaction = await sequelize.transaction();
 
   try {
+    // Se valida el transportador de correo dentro del intento, para que un
+    // SMTP no configurado no derive en un 500 al cliente: se revierte la
+    // transacción (la contraseña no cambia) y se registra el fallo solo
+    // en el servidor.
+    crearTransportador();
     await usuario.update(
       {
         contrasenaHash,
@@ -76,7 +73,8 @@ async function recuperarContrasena(correo) {
     await transaction.commit();
   } catch (error) {
     await transaction.rollback();
-    throw error;
+    // eslint-disable-next-line no-console
+    console.error('No se pudo completar la recuperación de contraseña:', error.message);
   }
 }
 
