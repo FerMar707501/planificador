@@ -58,5 +58,11 @@ module.exports = (sequelize) =>
       tableName: 'respaldos_sincronizacion',
       timestamps: false,
       underscored: true,
+      indexes: [
+        {
+          fields: ['id_usuario'],
+          name: 'idx_respaldos_id_usuario',
+        },
+      ],
     },
   );

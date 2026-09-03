@@ -46,5 +46,9 @@ module.exports = (sequelize) =>
       tableName: 'logs_sistema',
       timestamps: false,
       underscored: true,
+      indexes: [
+        { fields: ['id_usuario'], name: 'idx_logs_sistema_id_usuario' },
+        { fields: ['tipo_evento'], name: 'idx_logs_sistema_tipo_evento' },
+      ],
     },
   );
