@@ -14,6 +14,12 @@ async function registrar(req, res, next) {
   try {
     const usuario = await registrarUsuario(req.body);
 
+    // El registro no genera logs_sistema (el ENUM tipoEvento no contempla
+    // este caso). Se deja rastro solo en consola, sin datos sensibles.
+    console.log(
+      `[registro] Nuevo usuario creado: idUsuario=${usuario.idUsuario} nombreUsuario=${usuario.nombreUsuario}`,
+    );
+
     return res.status(201).json({
       usuario: usuarioPublico(usuario),
     });
@@ -42,6 +48,7 @@ async function iniciarSesion(req, res, next) {
       await registrarLog({
         idUsuario: usuario?.idUsuario,
         tipoEvento: 'login_fallido',
+        detalle: `Intento de inicio de sesión fallido para "${identificador}"`,
       });
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
@@ -50,6 +57,7 @@ async function iniciarSesion(req, res, next) {
     await registrarLog({
       idUsuario: usuario.idUsuario,
       tipoEvento: 'login_exitoso',
+      detalle: `Inicio de sesión exitoso (${usuario.nombreUsuario}) desde agente "${req.get('User-Agent') || 'desconocido'}"`,
     });
 
     return res.status(200).json({
